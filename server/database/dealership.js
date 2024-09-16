@@ -1,43 +1,43 @@
-const mongoose = require('mongoose');
+import { Schema as _Schema, model } from "mongoose";
 
-const Schema = mongoose.Schema;
+const Schema = _Schema;
 
 const dealerships = new Schema({
-	id: {
+  id: {
     type: Number,
     required: true,
-	},
-	city: {
+  },
+  city: {
     type: String,
-    required: true
+    required: true,
   },
   state: {
     type: String,
-    required: true
+    required: true,
   },
   address: {
     type: String,
-    required: true
+    required: true,
   },
   zip: {
     type: String,
-    required: true
+    required: true,
   },
   lat: {
     type: String,
-    required: true
+    required: true,
   },
   long: {
     type: String,
-    required: true
+    required: true,
   },
   short_name: {
     type: String,
   },
   full_name: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
-module.exports = mongoose.model('dealerships', dealerships);
+export default model("dealerships", dealerships);
