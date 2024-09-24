@@ -15,6 +15,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from .populate import initiate
 from .models import CarMake, CarModel
+from .restapis import analyze_review_sentiments, get_request, post_review
 
 
 # Get an instance of a logger
@@ -92,19 +93,66 @@ def registration(request):
         data = {"userName":userName,"error":"Already Registered"}
         return JsonResponse(data)
 
-# # Update the `get_dealerships` view to render the index page with
-# a list of dealerships
-# def get_dealerships(request):
-# ...
+def return_response(data = {}, request = None, status=200):
+    if status != 200 and request is not None:
+        print(request)
+    return JsonResponse({'status': status} | data)
+
+# # Update the `get_dealerships` view to render the index page with a list of dealerships
+def get_dealerships(request, state='all'):
+    endpoint = '/fetchDealers'
+    if state.lower() != 'all':
+        # Append the state if necessary
+        endpoint = f'{endpoint}/{state}'
+    dealerships = get_request(endpoint)
+    if dealerships != None:
+        return return_response({'dealers' : dealerships})
+    return return_response({"message": "Unable to get dealership info"}, request, 500)
+
+def is_non_floating_point(value):
+    try:
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                return False
+            value = int(value)
+        # Check if the value is an integer type
+        return isinstance(value, int)
+    except ValueError:
+        # If it can't be converted to an integer, it's not a non-floating point number
+        return False
 
 # Create a `get_dealer_reviews` view to render the reviews of a dealer
-# def get_dealer_reviews(request,dealer_id):
-# ...
+def get_dealer_reviews(request,dealer_id):
+    data_values = {"message": "Bad request"}
+    if dealer_id is None or not is_non_floating_point(dealer_id):
+        return return_response(data_values, request, 400)
+
+    reviews = get_request(f'fetchReviews/dealer/{dealer_id}')
+    for review_detail in reviews:
+        response = analyze_review_sentiments(review_detail['review'])
+        print(response)
+        review_detail['sentiment'] = response['sentiment']
+    return return_response({'reviews': reviews})
+    
 
 # Create a `get_dealer_details` view to render the dealer details
-# def get_dealer_details(request, dealer_id):
-# ...
+def get_dealer_details(request, dealer_id):
+    if dealer_id is None or not is_non_floating_point(dealer_id):
+        return JsonResponse({"status": 400, "message": "Bad request"})
+    dealer = get_request(f'/fetchDealer/{dealer_id}')
+    if dealer != None:
+        return return_response({'dealer': dealer})
+    return JsonResponse({"status": 500, "message": "Unable to get dealer info"})
 
 # Create a `add_review` view to submit a review
-# def add_review(request):
-# ...
+def add_review(request):
+    if(request.user.is_anonymous == False):
+        data = json.loads(request.body)
+        try:
+            post_review(data)
+            return return_response({})
+        except:
+            return return_response({'message': 'Error posting a review'}, request, 401)
+    else:
+        return return_response({"message":"Unauthorized"}, request, 403)
