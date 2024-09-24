@@ -37,12 +37,12 @@ try {
 }
 
 // Express route to home
-app.get("/", async (req, res) => {
+app.get("/", async (_req, res) => {
   res.send("Welcome to the Mongoose API");
 });
 
 // Express route to fetch all reviews
-app.get("/fetchReviews", async (req, res) => {
+app.get("/fetchReviews", async (_req, res) => {
   try {
     const documents = await findReviews();
     res.json(documents);

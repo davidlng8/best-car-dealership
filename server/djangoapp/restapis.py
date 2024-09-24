@@ -1,6 +1,7 @@
 import requests
 import os
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 
@@ -37,5 +38,14 @@ def analyze_review_sentiments(text):
         print(f"Unexpected {err=}, {type(err)=}")
         print("Network exception occurred")
 
-# def post_review(data_dict):
-# Add code for posting review
+def post_review(data_dict):
+    request_url = f'{backend_url}/insert_review'
+    print("POST to {} ".format(request_url))
+    print(json.dumps(data_dict, indent=2))
+    try:
+        response = requests.post(request_url,json=data_dict)
+        data = response.json()
+        print(data)
+        return data
+    except:
+        print("Network exception occurred")
