@@ -128,7 +128,7 @@ def get_dealer_reviews(request,dealer_id):
     if dealer_id is None or not is_non_floating_point(dealer_id):
         return return_response(data_values, request, 400)
 
-    reviews = get_request(f'fetchReviews/dealer/{dealer_id}')
+    reviews = get_request(f'/fetchReviews/dealer/{dealer_id}')
     for review_detail in reviews:
         response = analyze_review_sentiments(review_detail['review'])
         print(response)
