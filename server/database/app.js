@@ -7,6 +7,7 @@ const app = express();
 const port = 3030;
 
 app.use(cors());
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 const reviews_data = JSON.parse(readFileSync("reviews.json", "utf8"));
@@ -97,10 +98,9 @@ app.get("/fetchDealer/:id", async (req, res) => {
 
 //Express route to insert review
 app.post("/insert_review", raw({ type: "*/*" }), async (req, res) => {
-  data = JSON.parse(req.body);
+  const data = req.body;
   const documents = await findReviews().sort({ id: -1 });
   let new_id = documents[0]["id"] + 1;
-
   const review = new Reviews({
     id: new_id,
     name: data["name"],
