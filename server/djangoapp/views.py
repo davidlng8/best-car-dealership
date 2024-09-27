@@ -31,7 +31,11 @@ def get_cars(request):
     car_models = CarModel.objects.select_related('car_make')
     cars = []
     for car_model in car_models:
-        cars.append({"CarModel": car_model.name, "CarMake": car_model.car_make.name, "color": car_model.car_make.color})
+        cars.append({
+            "CarModel": car_model.name, 
+            "CarMake": car_model.car_make.name, 
+            "color": car_model.car_make.color
+        })
     return JsonResponse({"CarModels":cars})
 
 # Create a `login_request` view to handle sign in request
@@ -84,7 +88,13 @@ def registration(request):
     # If it is a new user
     if not username_exist:
         # Create user in auth_user table
-        user = User.objects.create_user(username=userName, first_name=firstName, last_name=lastName,password=password, email=email)
+        user = User.objects.create_user(
+            username=userName, 
+            first_name=firstName, 
+            last_name=lastName,
+            password=password, 
+            email=email
+        )
         # Login the user and redirect to list page
         login(request, user)
         data = {"userName":userName,"status":"Authenticated"}
@@ -98,7 +108,8 @@ def return_response(data = {}, request = None, status=200):
         print(request)
     return JsonResponse({'status': status} | data)
 
-# # Update the `get_dealerships` view to render the index page with a list of dealerships
+# Update the `get_dealerships` view to render 
+# the index page with a list of dealerships
 def get_dealerships(request, state='all'):
     endpoint = '/fetchDealers'
     if state.lower() != 'all':
@@ -107,7 +118,11 @@ def get_dealerships(request, state='all'):
     dealerships = get_request(endpoint)
     if dealerships != None:
         return return_response({'dealers' : dealerships})
-    return return_response({"message": "Unable to get dealership info"}, request, 500)
+    return return_response(
+        {"message": "Unable to get dealership info"}, 
+        request, 
+        500
+    )
 
 def is_non_floating_point(value):
     try:
@@ -119,7 +134,8 @@ def is_non_floating_point(value):
         # Check if the value is an integer type
         return isinstance(value, int)
     except ValueError:
-        # If it can't be converted to an integer, it's not a non-floating point number
+        # If it can't be converted to an integer, 
+        # it's not a non-floating point number
         return False
 
 # Create a `get_dealer_reviews` view to render the reviews of a dealer
@@ -143,7 +159,9 @@ def get_dealer_details(request, dealer_id):
     dealer = get_request(f'/fetchDealer/{dealer_id}')
     if dealer != None:
         return return_response({'dealer': dealer})
-    return JsonResponse({"status": 500, "message": "Unable to get dealer info"})
+    return JsonResponse(
+        {"status": 500, "message": "Unable to get dealer info"}
+    )
 
 # Create a `add_review` view to submit a review
 def add_review(request):
@@ -153,6 +171,10 @@ def add_review(request):
             post_review(data)
             return return_response({})
         except:
-            return return_response({'message': 'Error posting a review'}, request, 401)
+            return return_response(
+                {'message': 'Error posting a review'}, 
+                request, 
+                401
+            )
     else:
         return return_response({"message":"Unauthorized"}, request, 403)

@@ -13,13 +13,15 @@ class CarMake(models.Model):
     ('SILVER', 'Silver'),
     ('YELLOW', 'Yellow'),
   ]
-  color = models.CharField(max_length=20, choices=CAR_COLOURS, default='SILVER')
+  color = models.CharField(max_length=20, choices=CAR_COLOURS, 
+    default='SILVER')
 
   def __str__(self):
     return f'{self.name} ({self.color})' 
   
 class CarModel(models.Model):
-  car_make = models.ForeignKey(CarMake, on_delete=models.CASCADE)  # Many-to-One relationship
+  # Many-to-One relationship
+  car_make = models.ForeignKey(CarMake, on_delete=models.CASCADE)
   name = models.CharField(max_length=100)
   CAR_TYPES = [
     ('SEDAN', 'Sedan'),
@@ -36,4 +38,5 @@ class CarModel(models.Model):
   # Other fields as needed
 
   def __str__(self):
-    return f'{self.year} {self.name} - {self.car_make}'  # Return the name as the string representation
+    # Return the name as the string representation
+    return f'{self.year} {self.name} - {self.car_make}'
