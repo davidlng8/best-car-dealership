@@ -72,9 +72,10 @@ def does_username_exist(userName):
         # Check if user already exists
         User.objects.get(username=userName)
         return True
-    except:
+    except Exception as ex:
         # If not, simply log this is a new user
         logger.debug("{} is new user".format(userName))
+        logger.error("An error occurred: %s", ex, exc_info=True)
     return False
 
 
@@ -126,7 +127,7 @@ def get_dealerships(request, state="all"):
         # Append the state if necessary
         endpoint = f"{endpoint}/{state}"
     dealerships = get_request(endpoint)
-    if dealerships != None:
+    if dealerships is not None:
         return return_response({"dealers": dealerships})
     return return_response(
         {"message": "Unable to get dealership info"}, request, 500
@@ -167,7 +168,7 @@ def get_dealer_details(request, dealer_id):
     if dealer_id is None or not is_non_floating_point(dealer_id):
         return JsonResponse({"status": 400, "message": "Bad request"})
     dealer = get_request(f"/fetchDealer/{dealer_id}")
-    if dealer != None:
+    if dealer is not None:
         return return_response({"dealer": dealer})
     return JsonResponse(
         {"status": 500, "message": "Unable to get dealer info"}
@@ -176,12 +177,13 @@ def get_dealer_details(request, dealer_id):
 
 # Create a `add_review` view to submit a review
 def add_review(request):
-    if request.user.is_anonymous == False:
+    if not request.user.is_anonymous:
         data = json.loads(request.body)
         try:
             post_review(data)
             return return_response({})
-        except:
+        except Exception as ex:
+            logger.debug("An error occurred: %s", ex, exc_info=True)
             return return_response(
                 {"message": "Error posting a review"}, request, 401
             )
