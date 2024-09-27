@@ -128,7 +128,9 @@ def get_dealerships(request, state="all"):
     dealerships = get_request(endpoint)
     if dealerships != None:
         return return_response({"dealers": dealerships})
-    return return_response({"message": "Unable to get dealership info"}, request, 500)
+    return return_response(
+        {"message": "Unable to get dealership info"}, request, 500
+    )
 
 
 def is_non_floating_point(value):
@@ -167,7 +169,9 @@ def get_dealer_details(request, dealer_id):
     dealer = get_request(f"/fetchDealer/{dealer_id}")
     if dealer != None:
         return return_response({"dealer": dealer})
-    return JsonResponse({"status": 500, "message": "Unable to get dealer info"})
+    return JsonResponse(
+        {"status": 500, "message": "Unable to get dealer info"}
+    )
 
 
 # Create a `add_review` view to submit a review
@@ -178,6 +182,8 @@ def add_review(request):
             post_review(data)
             return return_response({})
         except:
-            return return_response({"message": "Error posting a review"}, request, 401)
+            return return_response(
+                {"message": "Error posting a review"}, request, 401
+            )
     else:
         return return_response({"message": "Unauthorized"}, request, 403)
